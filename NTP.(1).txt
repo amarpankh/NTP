@@ -1,0 +1,24 @@
+@echo off
+set "ip="
+for /f "tokens=2,3 delims={,}" %%a in ('"WMIC NICConfig where IPEnabled="True" get DefaultIPGateway /value | find "I" "') do if not defined ip set ip=%%~a
+echo\
+echo\
+echo  Your Gateway IP is :%ip%
+echo\
+echo\
+w32tm /unregister
+net stop w32time
+w32tm /register
+net start w32time
+tzutil /s "INDIA STANDARD TIME"
+w32tm /config /manualpeerlist:%ip% /syncfromflags:manual /reliable:yes /update
+net stop w32time
+net start w32time
+w32tm /resync
+echo\
+echo\
+echo YOUR SYSTEM TIME SYNCED WITH: 
+w32tm /query /source
+echo\
+echo\
+pause
